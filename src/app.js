@@ -91,6 +91,20 @@ function app(ws, req) {
         controller.send(JSON.stringify(action));
         break;
       }
+      case ActionType.MACHINE_STOP: {
+        console.log('MACHINE_STOP signal received');
+        const machine = machines[0];
+        const action = { type: ActionType.MACHINE_STOP };
+        machine.send(JSON.stringify(action));
+        break;
+      }
+      case ActionType.MACHINE_STOPPED: {
+        console.log('MACHINE_STOPPED signal received');
+        const controller = controllers[0];
+        const action = { type: ActionType.MACHINE_STOPPED };
+        controller.send(JSON.stringify(action));
+        break;
+      }
       default: {
         console.log('Unknown action:', action);
         const reaction = { type: 'UNKNOWN_ACTION' };
