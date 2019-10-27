@@ -77,6 +77,20 @@ function app(ws, req) {
         }
         break;
       }
+      case ActionType.MACHINE_START: {
+        console.log('MACHINE_START signal received');
+        const machine = machines[0];
+        const action = { type: ActionType.MACHINE_START };
+        machine.send(JSON.stringify(action));
+        break;
+      }
+      case ActionType.MACHINE_STARTED: {
+        console.log('MACHINE_STARTED signal received');
+        const controller = controllers[0];
+        const action = { type: ActionType.MACHINE_STARTED };
+        controller.send(JSON.stringify(action));
+        break;
+      }
       default: {
         console.log('Unknown action:', action);
         const reaction = { type: 'UNKNOWN_ACTION' };
