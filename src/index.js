@@ -1,13 +1,24 @@
+const http = require('http');
 const WebSocket = require('ws');
 
 const app = require('./app');
 
-const port = process.env.PORT || 3000;
-const wss = new WebSocket.Server({ port });
+const greetingMessage = `
+harvey.one websocket control server.
 
+Connect to this server via WS protocol:
+ws://[CURRENT_URL]/
+`;
+
+const server = http.createServer((req, res) => {
+  res.end(greetingMessage);
+});
+
+const wss = new WebSocket.Server({ server });
 wss.on('connection', app);
 
-wss.on('listening', () => {
-  console.log('harvey websocket sandbox server listening on port '
-    + wss.address().port + '...');
+const port = process.env.PORT || 3000;
+server.listen(port, () => {
+  console.log('harvey-control-server listening on port '
+    + server.address().port + '...');
 });
