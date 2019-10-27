@@ -2,6 +2,8 @@ const WebSocket = require('ws');
 
 const ActionType = {
   MACHINE_CONNECT: 'MACHINE_CONNECT',
+  MACHINE_ACCEPTED: 'MACHINE_ACCEPTED',
+  MACHINE_REJECTED: 'MACHINE_REJECTED',
   CONTROLLER_CONNECT: 'CONTROLLER_CONNECT',
   CONTROLLER_ACCEPTED: 'CONTROLLER_ACCEPTED',
   CONTROLLER_REJECTED: 'CONTROLLER_REJECTED',
@@ -36,7 +38,7 @@ wss.on('connection', function connection(ws, req) {
         if (machines.length > 0) {
           console.log('REJECTED: unable to connect more than one machine.');
           const reaction = {
-            type: 'MACHINE_REJECTED',
+            type: ActionType.MACHINE_REJECTED,
             error: 'Unable to connect more than one machine.',
           };
           ws.send(JSON.stringify(reaction));
@@ -44,6 +46,11 @@ wss.on('connection', function connection(ws, req) {
         } else {
           // pushing new machine's websocket into registry
           machines.push(ws);
+          // notifying the machine that it has been accepted by the server
+          const reaction = {
+            type: ActionType.MACHINE_ACCEPTED,
+          };
+          ws.send(JSON.stringify(reaction));
           // notifying (possible) controller about machine online status
           const controller = controllers[0];
           if (controller) {
