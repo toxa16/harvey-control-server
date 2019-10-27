@@ -3,6 +3,8 @@ const WebSocket = require('ws');
 const ActionType = {
   MACHINE_CONNECT: 'MACHINE_CONNECT',
   CONTROLLER_CONNECT: 'CONTROLLER_CONNECT',
+  CONTROLLER_ACCEPTED: 'CONTROLLER_ACCEPTED',
+  CONTROLLER_REJECTED: 'CONTROLLER_REJECTED',
   MACHINE_OFFLINE: 'MACHINE_OFFLINE',
   MACHINE_ONLINE: 'MACHINE_ONLINE',
 };
@@ -56,7 +58,7 @@ wss.on('connection', function connection(ws, req) {
         if (controllers.length > 0) {
           console.log('REJECTED: unable to connect more than one controller.');
           const reaction = {
-            type: 'CONTROLLER_REJECTED',
+            type: ActionType.CONTROLLER_REJECTED,
             error: 'Unable to connect more than one controller.',
           };
           ws.send(JSON.stringify(reaction));
@@ -64,6 +66,11 @@ wss.on('connection', function connection(ws, req) {
         } else {
           // registering new contoller's websocket
           controllers.push(ws);
+          // notifying the controller that it has been accepted by the server
+          const reaction = {
+            type: ActionType.CONTROLLER_ACCEPTED,
+          };
+          ws.send(JSON.stringify(reaction));
           // sending machine online status to the controller
           const machine = machines[0];
           if (machine) {
@@ -103,15 +110,6 @@ wss.on('connection', function connection(ws, req) {
       console.log(`Unknown client ${remotePort} disconnected with code ${code}`);
     }
   });
-
-  /*const getRandomStatus = () => {
-    if (Math.random() >= 0.5) {
-      return 'MACHINE_ONLINE';
-    }
-    return 'MACHINE_OFFLINE';
-  }
-  const action = { type: getRandomStatus() };
-  ws.send(JSON.stringify(action));*/
 });
 
 wss.on('listening', () => {
